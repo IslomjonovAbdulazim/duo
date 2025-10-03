@@ -88,6 +88,8 @@ export function LessonsTable({
         return 'bg-blue-100 text-blue-800 hover:bg-blue-100'
       case 'story':
         return 'bg-purple-100 text-purple-800 hover:bg-purple-100'
+      case 'test':
+        return 'bg-orange-100 text-orange-800 hover:bg-orange-100'
       default:
         return 'bg-gray-100 text-gray-800 hover:bg-gray-100'
     }
@@ -169,13 +171,16 @@ export function LessonsTable({
             <TableBody>
               {sortedLessons.map((lesson) => {
                 const isSelected = selectedLesson?.id === lesson.id
+                const isTestLesson = lesson.lesson_type === 'test'
                 return (
                 <TableRow 
                   key={lesson.id}
-                  className={`cursor-pointer transition-colors hover:bg-muted/50 ${
-                    isSelected ? 'bg-muted border-l-4 border-l-primary' : ''
-                  }`}
-                  onClick={() => onLessonClick?.(lesson)}
+                  className={`transition-colors ${
+                    isTestLesson 
+                      ? 'cursor-not-allowed opacity-70' 
+                      : 'cursor-pointer hover:bg-muted/50'
+                  } ${isSelected ? 'bg-muted border-l-4 border-l-primary' : ''}`}
+                  onClick={() => !isTestLesson && onLessonClick?.(lesson)}
                 >
                   <TableCell>
                     <Badge variant='outline' className='w-8 h-8 rounded-full flex items-center justify-center p-0'>

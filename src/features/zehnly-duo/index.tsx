@@ -191,6 +191,11 @@ export function ZehnlyDuoPage() {
   }
 
   const handleLessonClick = (lesson: Lesson) => {
+    // Test lessons should not be clickable for navigation
+    if (lesson.lesson_type === 'test') {
+      return
+    }
+    
     setSelectedLesson(lesson)
     const newTab = lesson.lesson_type === 'word' ? 'words' : lesson.lesson_type === 'story' ? 'story' : 'words'
     setActiveTab(newTab)

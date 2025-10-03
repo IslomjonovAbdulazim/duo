@@ -25,6 +25,9 @@ export const updateCourseSchema = z.object({
   learning_center_id: z.number().min(1, 'Learning center is required').optional(),
 })
 
+// Lesson types enum
+export const lessonTypeSchema = z.enum(['word', 'story', 'test'])
+
 // Lesson schemas
 export const lessonSchema = z.object({
   id: z.number(),
@@ -37,12 +40,16 @@ export const lessonSchema = z.object({
   created_at: z.string(),
   updated_at: z.string(),
   words_count: z.number().optional(),
+  lesson_type: lessonTypeSchema.optional(),
+  word_lesson_id: z.number().optional(),
 })
 
 export const createLessonSchema = z.object({
   title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
   content: z.string().min(1, 'Content is required').max(5000, 'Content must be less than 5000 characters'),
   order: z.number().min(1, 'Order must be at least 1'),
+  lesson_type: lessonTypeSchema.optional().default('word'),
+  word_lesson_id: z.number().optional(),
 })
 
 export const updateLessonSchema = z.object({
@@ -50,6 +57,8 @@ export const updateLessonSchema = z.object({
   content: z.string().min(1, 'Content is required').max(5000, 'Content must be less than 5000 characters').optional(),
   order: z.number().min(1, 'Order must be at least 1').optional(),
   is_active: z.boolean().optional(),
+  lesson_type: lessonTypeSchema.optional(),
+  word_lesson_id: z.number().optional(),
 })
 
 // Word schemas
@@ -162,4 +171,11 @@ export const difficultyOptions = [
   { value: 'easy', label: 'Easy', color: 'bg-green-100 text-green-700' },
   { value: 'medium', label: 'Medium', color: 'bg-yellow-100 text-yellow-700' },
   { value: 'hard', label: 'Hard', color: 'bg-red-100 text-red-700' },
+] as const
+
+// Lesson type options for UI
+export const lessonTypeOptions = [
+  { value: 'word', label: 'Word Lesson', description: 'Vocabulary and word learning' },
+  { value: 'story', label: 'Story Lesson', description: 'Reading comprehension and stories' },
+  { value: 'test', label: 'Test Lesson', description: 'Assessment based on word lessons' },
 ] as const

@@ -144,6 +144,7 @@ export function CreateLessonDialog({ chapterId, children, onSuccess }: CreateLes
                         <SelectContent>
                           <SelectItem value='word'>Word</SelectItem>
                           <SelectItem value='story'>Story</SelectItem>
+                          <SelectItem value='test'>Test</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

@@ -29,7 +29,8 @@ export interface Lesson {
   content: string
   chapter_id: number
   order: number
-  lesson_type: 'word' | 'story'
+  lesson_type: 'word' | 'story' | 'test'
+  word_lesson_id?: number
 }
 
 export interface Word {
@@ -79,16 +80,18 @@ export interface CreateLessonRequest {
   title: string
   chapter_id: number
   order: number
-  lesson_type: 'word' | 'story'
+  lesson_type: 'word' | 'story' | 'test'
   content: string
+  word_lesson_id?: number
 }
 
 export interface UpdateLessonRequest {
   title?: string
   chapter_id?: number
   order?: number
-  lesson_type?: 'word' | 'story'
+  lesson_type?: 'word' | 'story' | 'test'
   content?: string
+  word_lesson_id?: number
 }
 
 export interface CreateWordRequest {

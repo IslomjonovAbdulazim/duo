@@ -1,9 +1,9 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { Edit, BookOpen } from 'lucide-react'
+import { Edit, BookOpen, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -23,8 +23,15 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { contentApi, type Lesson } from '@/lib/content-api'
-import { updateLessonSchema, type UpdateLessonData } from '../data/schema'
+import { updateLessonSchema, type UpdateLessonData, lessonTypeOptions } from '../data/schema'
 
 interface EditLessonDialogProps {
   lesson: Lesson | null
@@ -35,15 +42,38 @@ interface EditLessonDialogProps {
 
 export function EditLessonDialog({ lesson, open, onOpenChange, onSuccess }: EditLessonDialogProps) {
   const queryClient = useQueryClient()
+  const [wordLessonSearch, setWordLessonSearch] = useState('')
 
-  const form = useForm<UpdateLessonData>({
+  const form = useForm({
     resolver: zodResolver(updateLessonSchema),
     defaultValues: {
       title: '',
       content: '',
       order: 1,
+      lesson_type: 'word',
+      word_lesson_id: undefined,
     },
   })
+
+  // Watch lesson type to conditionally show word lesson search
+  const watchedLessonType = form.watch('lesson_type')
+
+  // Fetch word lessons for search (only when lesson type is TEST)
+  const { data: wordLessons, isLoading: wordLessonsLoading } = useQuery({
+    queryKey: ['word-lessons', lesson?.chapter_id],
+    queryFn: async () => {
+      if (!lesson?.chapter_id) return []
+      // Get all lessons in this chapter and filter for word lessons
+      const allLessons = await contentApi.lessons.listByChapter(lesson.chapter_id)
+      return allLessons.filter(l => l.lesson_type === 'word' && l.id !== lesson?.id)
+    },
+    enabled: watchedLessonType === 'test' && !!lesson && open,
+  })
+
+  // Filter word lessons based on search
+  const filteredWordLessons = wordLessons?.filter(l => 
+    l.title.toLowerCase().includes(wordLessonSearch.toLowerCase())
+  ) || []
 
 
   // Update lesson mutation
@@ -72,11 +102,13 @@ export function EditLessonDialog({ lesson, open, onOpenChange, onSuccess }: Edit
         title: lesson.title,
         content: lesson.content,
         order: lesson.order,
+        lesson_type: lesson.lesson_type || 'word',
+        word_lesson_id: lesson.word_lesson_id,
       })
     }
   }, [lesson, form])
 
-  const handleSubmit = (data: UpdateLessonData) => {
+  const handleSubmit = (data: any) => {
     updateMutation.mutate(data)
   }
 
@@ -138,6 +170,90 @@ export function EditLessonDialog({ lesson, open, onOpenChange, onSuccess }: Edit
                   />
                 </div>
               </div>
+
+              <FormField
+                control={form.control}
+                name='lesson_type'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Lesson Type *</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange}
+                      value={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Select lesson type' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {lessonTypeOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            <div className='flex flex-col'>
+                              <span className='font-medium'>{option.label}</span>
+                              <span className='text-xs text-muted-foreground'>{option.description}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {watchedLessonType === 'test' && (
+                <FormField
+                  control={form.control}
+                  name='word_lesson_id'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Connect to Word Lesson *</FormLabel>
+                      <div className='space-y-2'>
+                        <div className='relative'>
+                          <Search className='absolute left-3 top-3 h-4 w-4 text-muted-foreground' />
+                          <Input
+                            placeholder='Search word lessons...'
+                            value={wordLessonSearch}
+                            onChange={(e) => setWordLessonSearch(e.target.value)}
+                            className='pl-10'
+                          />
+                        </div>
+                        <Select 
+                          onValueChange={(value) => field.onChange(parseInt(value))}
+                          value={field.value?.toString()}
+                          disabled={wordLessonsLoading}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder='Select a word lesson to connect' />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className='max-h-60'>
+                            {filteredWordLessons.map((wordLesson) => (
+                              <SelectItem key={wordLesson.id} value={wordLesson.id.toString()}>
+                                <div className='flex items-center gap-2'>
+                                  <BookOpen className='h-4 w-4 text-muted-foreground' />
+                                  <div className='flex flex-col'>
+                                    <span>{wordLesson.title}</span>
+                                    <span className='text-xs text-muted-foreground'>Order: {wordLesson.order}</span>
+                                  </div>
+                                </div>
+                              </SelectItem>
+                            ))}
+                            {filteredWordLessons.length === 0 && !wordLessonsLoading && (
+                              <div className='p-2 text-sm text-muted-foreground text-center'>
+                                {wordLessonSearch ? 'No word lessons found matching your search' : 'No word lessons available'}
+                              </div>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <FormField
                 control={form.control}
