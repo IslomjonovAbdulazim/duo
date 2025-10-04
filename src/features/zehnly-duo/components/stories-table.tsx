@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import {
   MoreHorizontal,
   Edit,
@@ -40,6 +40,7 @@ interface StoriesTableProps {
   isLoading?: boolean
   onEdit: (story: Story) => void
   onRefresh: () => void
+  lessonId?: number
 }
 
 export function StoriesTable({
@@ -47,10 +48,30 @@ export function StoriesTable({
   isLoading,
   onEdit,
   onRefresh,
+  lessonId: _lessonId,
 }: StoriesTableProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [storyToDelete, setStoryToDelete] = useState<Story | null>(null)
   const queryClient = useQueryClient()
+
+  // Get unique word lesson IDs from stories
+  const wordLessonIds = [...new Set(data.filter(story => story.word_lesson_id).map(story => story.word_lesson_id!))]
+
+  // Fetch word lessons to display their titles
+  const { data: wordLessons } = useQuery({
+    queryKey: ['word-lessons-by-ids', wordLessonIds],
+    queryFn: async () => {
+      if (wordLessonIds.length === 0) return []
+      const lessons = await Promise.all(
+        wordLessonIds.map(id => contentApi.lessons.get(id))
+      )
+      return lessons
+    },
+    enabled: wordLessonIds.length > 0,
+  })
+
+  // Create a map for quick lookup
+  const wordLessonMap = new Map(wordLessons?.map(lesson => [lesson.id, lesson]) || [])
 
   // Delete story mutation
   const deleteMutation = useMutation({
@@ -156,6 +177,7 @@ export function StoriesTable({
             <TableHeader>
               <TableRow>
                 <TableHead>Story Text</TableHead>
+                <TableHead>Word Lesson</TableHead>
                 <TableHead>Audio</TableHead>
                 <TableHead className='w-[70px]'>Actions</TableHead>
               </TableRow>
@@ -177,6 +199,19 @@ export function StoriesTable({
                         ID: #{story.id} • {story.story_text.length} characters
                       </div>
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    {story.word_lesson_id ? (
+                      <div className='flex items-center gap-2'>
+                        <Badge variant='secondary' className='text-xs'>
+                          {wordLessonMap.get(story.word_lesson_id)?.title || `Lesson #${story.word_lesson_id}`}
+                        </Badge>
+                      </div>
+                    ) : (
+                      <Badge variant='outline' className='text-xs text-muted-foreground'>
+                        No connection
+                      </Badge>
+                    )}
                   </TableCell>
                   <TableCell>
                     <div className='flex items-center gap-2'>

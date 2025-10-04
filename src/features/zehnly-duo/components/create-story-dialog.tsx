@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { PlusCircle, FileText, Zap, Upload } from 'lucide-react'
+import { PlusCircle, FileText, Zap, Upload, Search } from 'lucide-react'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import {
@@ -24,6 +24,14 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Textarea } from '@/components/ui/textarea'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { contentApi } from '@/lib/content-api'
 import { DirectAudioGenerationButton } from '@/components/direct-audio-generation-button'
 import { FileUploadDialog } from '@/components/file-upload-dialog'
@@ -31,6 +39,7 @@ import { FileUploadDialog } from '@/components/file-upload-dialog'
 // Schema for story creation
 const createStorySchema = z.object({
   story_text: z.string().min(1, 'Story text is required'),
+  word_lesson_id: z.number().optional(),
 })
 
 type CreateStoryData = z.infer<typeof createStorySchema>
@@ -44,12 +53,38 @@ interface CreateStoryDialogProps {
 export function CreateStoryDialog({ lessonId, children, onSuccess }: CreateStoryDialogProps) {
   const [open, setOpen] = useState(false)
   const [createdStoryId, setCreatedStoryId] = useState<number | null>(null)
+  const [wordLessonSearch, setWordLessonSearch] = useState('')
   const queryClient = useQueryClient()
+
+  // Fetch current lesson to get chapter_id
+  const { data: currentLesson } = useQuery({
+    queryKey: ['lesson', lessonId],
+    queryFn: () => contentApi.lessons.get(lessonId),
+    enabled: !!lessonId && open,
+  })
+
+  // Fetch word lessons for search
+  const { data: wordLessons, isLoading: wordLessonsLoading } = useQuery({
+    queryKey: ['word-lessons', currentLesson?.chapter_id],
+    queryFn: async () => {
+      if (!currentLesson?.chapter_id) return []
+      // Get all lessons in this chapter and filter for word lessons
+      const allLessons = await contentApi.lessons.listByChapter(currentLesson.chapter_id)
+      return allLessons.filter(l => l.lesson_type === 'word' && l.id !== lessonId)
+    },
+    enabled: !!currentLesson?.chapter_id && open,
+  })
+
+  // Filter word lessons based on search
+  const filteredWordLessons = wordLessons?.filter(l => 
+    l.title.toLowerCase().includes(wordLessonSearch.toLowerCase())
+  ) || []
 
   const form = useForm<CreateStoryData>({
     resolver: zodResolver(createStorySchema),
     defaultValues: {
       story_text: '',
+      word_lesson_id: undefined,
     },
   })
 
@@ -60,6 +95,7 @@ export function CreateStoryDialog({ lessonId, children, onSuccess }: CreateStory
         ...data,
         lesson_id: lessonId,
         audio_url: null,
+        word_lesson_id: data.word_lesson_id,
       }),
     onSuccess: (createdStory) => {
       toast.success('Story created successfully')
@@ -84,6 +120,7 @@ export function CreateStoryDialog({ lessonId, children, onSuccess }: CreateStory
     if (!open) {
       // Reset state when dialog closes
       setCreatedStoryId(null)
+      setWordLessonSearch('')
       form.reset()
     }
   }
@@ -125,6 +162,60 @@ export function CreateStoryDialog({ lessonId, children, onSuccess }: CreateStory
                       />
                     </FormControl>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Word Lesson Selection */}
+              <FormField
+                control={form.control}
+                name='word_lesson_id'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Connect to Word Lesson (Optional)</FormLabel>
+                    <Select 
+                      onValueChange={(value) => field.onChange(value === 'none' ? undefined : Number(value))} 
+                      value={field.value ? String(field.value) : undefined}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Select a word lesson to connect...' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <div className='p-2'>
+                          <div className='relative'>
+                            <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4' />
+                            <Input
+                              placeholder='Search word lessons...'
+                              value={wordLessonSearch}
+                              onChange={(e) => setWordLessonSearch(e.target.value)}
+                              className='pl-10'
+                            />
+                          </div>
+                        </div>
+                        <SelectItem value='none'>No word lesson connection</SelectItem>
+                        {wordLessonsLoading ? (
+                          <div className='p-2 text-center text-sm text-muted-foreground'>
+                            Loading word lessons...
+                          </div>
+                        ) : filteredWordLessons.length > 0 ? (
+                          filteredWordLessons.map((lesson) => (
+                            <SelectItem key={lesson.id} value={String(lesson.id)}>
+                              {lesson.title}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <div className='p-2 text-center text-sm text-muted-foreground'>
+                            {wordLessonSearch ? 'No word lessons found matching your search' : 'No word lessons available'}
+                          </div>
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                    <p className='text-xs text-muted-foreground'>
+                      Connect this story to a specific word lesson to reinforce vocabulary learning.
+                    </p>
                   </FormItem>
                 )}
               />

@@ -1,9 +1,9 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { Edit, Volume2, Zap, Upload } from 'lucide-react'
+import { Edit, Volume2, Zap, Upload, Search } from 'lucide-react'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import {
@@ -23,6 +23,14 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Textarea } from '@/components/ui/textarea'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { contentApi, type Story, buildMediaUrl } from '@/lib/content-api'
 import { DirectAudioGenerationButton } from '@/components/direct-audio-generation-button'
 import { FileUploadDialog } from '@/components/file-upload-dialog'
@@ -30,6 +38,7 @@ import { FileUploadDialog } from '@/components/file-upload-dialog'
 // Schema for story update
 const updateStorySchema = z.object({
   story_text: z.string().min(1, 'Story text is required'),
+  word_lesson_id: z.number().optional(),
 })
 
 type UpdateStoryData = z.infer<typeof updateStorySchema>
@@ -42,12 +51,38 @@ interface EditStoryDialogProps {
 }
 
 export function EditStoryDialog({ story, open, onOpenChange, onSuccess }: EditStoryDialogProps) {
+  const [wordLessonSearch, setWordLessonSearch] = useState('')
   const queryClient = useQueryClient()
+
+  // Fetch current lesson to get chapter_id
+  const { data: currentLesson } = useQuery({
+    queryKey: ['lesson', story?.lesson_id],
+    queryFn: () => contentApi.lessons.get(story!.lesson_id),
+    enabled: !!story?.lesson_id && open,
+  })
+
+  // Fetch word lessons for search
+  const { data: wordLessons, isLoading: wordLessonsLoading } = useQuery({
+    queryKey: ['word-lessons', currentLesson?.chapter_id],
+    queryFn: async () => {
+      if (!currentLesson?.chapter_id) return []
+      // Get all lessons in this chapter and filter for word lessons
+      const allLessons = await contentApi.lessons.listByChapter(currentLesson.chapter_id)
+      return allLessons.filter(l => l.lesson_type === 'word' && l.id !== story?.lesson_id)
+    },
+    enabled: !!currentLesson?.chapter_id && open,
+  })
+
+  // Filter word lessons based on search
+  const filteredWordLessons = wordLessons?.filter(l => 
+    l.title.toLowerCase().includes(wordLessonSearch.toLowerCase())
+  ) || []
 
   const form = useForm<UpdateStoryData>({
     resolver: zodResolver(updateStorySchema),
     defaultValues: {
       story_text: '',
+      word_lesson_id: undefined,
     },
   })
 
@@ -74,6 +109,7 @@ export function EditStoryDialog({ story, open, onOpenChange, onSuccess }: EditSt
     if (story) {
       form.reset({
         story_text: story.story_text,
+        word_lesson_id: story.word_lesson_id,
       })
     }
   }, [story, form])
@@ -113,6 +149,60 @@ export function EditStoryDialog({ story, open, onOpenChange, onSuccess }: EditSt
                       />
                     </FormControl>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Word Lesson Selection */}
+              <FormField
+                control={form.control}
+                name='word_lesson_id'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Connect to Word Lesson (Optional)</FormLabel>
+                    <Select 
+                      onValueChange={(value) => field.onChange(value === 'none' ? undefined : Number(value))} 
+                      value={field.value ? String(field.value) : undefined}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Select a word lesson to connect...' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <div className='p-2'>
+                          <div className='relative'>
+                            <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4' />
+                            <Input
+                              placeholder='Search word lessons...'
+                              value={wordLessonSearch}
+                              onChange={(e) => setWordLessonSearch(e.target.value)}
+                              className='pl-10'
+                            />
+                          </div>
+                        </div>
+                        <SelectItem value='none'>No word lesson connection</SelectItem>
+                        {wordLessonsLoading ? (
+                          <div className='p-2 text-center text-sm text-muted-foreground'>
+                            Loading word lessons...
+                          </div>
+                        ) : filteredWordLessons.length > 0 ? (
+                          filteredWordLessons.map((lesson) => (
+                            <SelectItem key={lesson.id} value={String(lesson.id)}>
+                              {lesson.title}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <div className='p-2 text-center text-sm text-muted-foreground'>
+                            {wordLessonSearch ? 'No word lessons found matching your search' : 'No word lessons available'}
+                          </div>
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                    <p className='text-xs text-muted-foreground'>
+                      Connect this story to a specific word lesson to reinforce vocabulary learning.
+                    </p>
                   </FormItem>
                 )}
               />

@@ -49,6 +49,7 @@ export interface Story {
   lesson_id: number
   story_text: string
   audio_url: string | null
+  word_lesson_id?: number
 }
 
 // Request types
@@ -118,12 +119,14 @@ export interface CreateStoryRequest {
   lesson_id: number
   story_text: string
   audio_url?: string | null
+  word_lesson_id?: number
 }
 
 export interface UpdateStoryRequest {
   lesson_id?: number
   story_text?: string
   audio_url?: string | null
+  word_lesson_id?: number
 }
 
 // Query params (simplified for new API)
