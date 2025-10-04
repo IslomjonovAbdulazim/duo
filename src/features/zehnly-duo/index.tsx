@@ -485,9 +485,10 @@ export function ZehnlyDuoPage() {
                   </p>
                 )}
               </div>
-              {selectedLesson && selectedLesson.lesson_type === 'story' && (
+              {selectedLesson && selectedLesson.lesson_type === 'story' && selectedChapter && (
                 <CreateStoryDialog 
-                  lessonId={selectedLesson.id} 
+                  lessonId={selectedLesson.id}
+                  chapterId={selectedChapter.id}
                   onSuccess={handleRefreshStories}
                 >
                   <Button>
@@ -545,6 +546,7 @@ export function ZehnlyDuoPage() {
 
       <EditStoryDialog
         story={selectedStory}
+        chapterId={selectedChapter?.id}
         open={editStoryDialogOpen}
         onOpenChange={setEditStoryDialogOpen}
         onSuccess={handleRefreshStories}

@@ -45,32 +45,26 @@ type UpdateStoryData = z.infer<typeof updateStorySchema>
 
 interface EditStoryDialogProps {
   story: Story | null
+  chapterId?: number
   open: boolean
   onOpenChange: (open: boolean) => void
   onSuccess?: () => void
 }
 
-export function EditStoryDialog({ story, open, onOpenChange, onSuccess }: EditStoryDialogProps) {
+export function EditStoryDialog({ story, chapterId, open, onOpenChange, onSuccess }: EditStoryDialogProps) {
   const [wordLessonSearch, setWordLessonSearch] = useState('')
   const queryClient = useQueryClient()
 
-  // Fetch current lesson to get chapter_id
-  const { data: currentLesson } = useQuery({
-    queryKey: ['lesson', story?.lesson_id],
-    queryFn: () => contentApi.lessons.get(story!.lesson_id),
-    enabled: !!story?.lesson_id && open,
-  })
-
-  // Fetch word lessons for search
+  // Fetch word lessons for search directly from chapter
   const { data: wordLessons, isLoading: wordLessonsLoading } = useQuery({
-    queryKey: ['word-lessons', currentLesson?.chapter_id],
+    queryKey: ['word-lessons', chapterId],
     queryFn: async () => {
-      if (!currentLesson?.chapter_id) return []
+      if (!chapterId) return []
       // Get all lessons in this chapter and filter for word lessons
-      const allLessons = await contentApi.lessons.listByChapter(currentLesson.chapter_id)
+      const allLessons = await contentApi.lessons.listByChapter(chapterId)
       return allLessons.filter(l => l.lesson_type === 'word' && l.id !== story?.lesson_id)
     },
-    enabled: !!currentLesson?.chapter_id && open,
+    enabled: !!chapterId && open,
   })
 
   // Filter word lessons based on search

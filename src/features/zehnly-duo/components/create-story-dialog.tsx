@@ -46,33 +46,27 @@ type CreateStoryData = z.infer<typeof createStorySchema>
 
 interface CreateStoryDialogProps {
   lessonId: number
+  chapterId: number
   children?: React.ReactNode
   onSuccess?: () => void
 }
 
-export function CreateStoryDialog({ lessonId, children, onSuccess }: CreateStoryDialogProps) {
+export function CreateStoryDialog({ lessonId, chapterId, children, onSuccess }: CreateStoryDialogProps) {
   const [open, setOpen] = useState(false)
   const [createdStoryId, setCreatedStoryId] = useState<number | null>(null)
   const [wordLessonSearch, setWordLessonSearch] = useState('')
   const queryClient = useQueryClient()
 
-  // Fetch current lesson to get chapter_id
-  const { data: currentLesson } = useQuery({
-    queryKey: ['lesson', lessonId],
-    queryFn: () => contentApi.lessons.get(lessonId),
-    enabled: !!lessonId && open,
-  })
-
-  // Fetch word lessons for search
+  // Fetch word lessons for search directly from chapter
   const { data: wordLessons, isLoading: wordLessonsLoading } = useQuery({
-    queryKey: ['word-lessons', currentLesson?.chapter_id],
+    queryKey: ['word-lessons', chapterId],
     queryFn: async () => {
-      if (!currentLesson?.chapter_id) return []
+      if (!chapterId) return []
       // Get all lessons in this chapter and filter for word lessons
-      const allLessons = await contentApi.lessons.listByChapter(currentLesson.chapter_id)
+      const allLessons = await contentApi.lessons.listByChapter(chapterId)
       return allLessons.filter(l => l.lesson_type === 'word' && l.id !== lessonId)
     },
-    enabled: !!currentLesson?.chapter_id && open,
+    enabled: !!chapterId && open,
   })
 
   // Filter word lessons based on search
