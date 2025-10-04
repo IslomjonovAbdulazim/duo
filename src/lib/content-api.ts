@@ -177,7 +177,7 @@ export interface FileUploadResponse {
 }
 
 // Voice options for audio generation
-export type VoiceOption = 'amy' | 'brian' | 'emma' | 'russell' | 'sally'
+export type VoiceOption = 'amy' | 'brian' | 'emma' | 'russell' | 'sally' | 'Betty'
 
 // Base URL for media assets (from environment or default)
 const MEDIA_BASE_URL = import.meta.env.VITE_MEDIA_BASE_URL || 'https://zehnlyduo-production.up.railway.app'

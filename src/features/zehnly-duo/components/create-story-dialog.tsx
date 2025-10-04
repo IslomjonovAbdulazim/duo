@@ -55,6 +55,7 @@ export function CreateStoryDialog({ lessonId, chapterId, children, onSuccess }: 
   const [open, setOpen] = useState(false)
   const [createdStoryId, setCreatedStoryId] = useState<number | null>(null)
   const [wordLessonSearch, setWordLessonSearch] = useState('')
+  const [storyVoice, setStoryVoice] = useState<string>('Betty')
   const queryClient = useQueryClient()
 
   // Fetch word lessons for search directly from chapter
@@ -115,6 +116,7 @@ export function CreateStoryDialog({ lessonId, chapterId, children, onSuccess }: 
       // Reset state when dialog closes
       setCreatedStoryId(null)
       setWordLessonSearch('')
+      setStoryVoice('Betty')
       form.reset()
     }
   }
@@ -222,14 +224,29 @@ export function CreateStoryDialog({ lessonId, chapterId, children, onSuccess }: 
                     {/* Story Audio */}
                     <div className='space-y-2'>
                       <span className='text-sm font-medium'>Story Narration</span>
-                      <div className='flex gap-2'>
-                        <DirectAudioGenerationButton
-                          onGenerate={() => contentApi.stories.generateAudio(createdStoryId, null)}
-                          queryKey={['stories', lessonId]}
-                        >
-                          <Zap className='h-4 w-4 mr-2' />
-                          Generate
-                        </DirectAudioGenerationButton>
+                      <div className='space-y-2'>
+                        <Select value={storyVoice} onValueChange={setStoryVoice}>
+                          <SelectTrigger className='w-48'>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value='Betty'>
+                              <div className='flex items-center gap-2'>
+                                <span>🇺🇸</span>
+                                Betty
+                              </div>
+                            </SelectItem>
+                            <SelectItem value='default'>Default</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <div className='flex gap-2'>
+                          <DirectAudioGenerationButton
+                            onGenerate={() => contentApi.stories.generateAudio(createdStoryId, storyVoice === 'default' ? null : storyVoice as any)}
+                            queryKey={['stories', lessonId]}
+                          >
+                            <Zap className='h-4 w-4 mr-2' />
+                            Generate
+                          </DirectAudioGenerationButton>
                         <FileUploadDialog
                           title='Upload Story Audio'
                           description='Upload an MP3 audio file for story narration.'
@@ -242,6 +259,7 @@ export function CreateStoryDialog({ lessonId, chapterId, children, onSuccess }: 
                             Upload
                           </Button>
                         </FileUploadDialog>
+                        </div>
                       </div>
                       <p className='text-xs text-muted-foreground'>
                         Generate AI narration or upload your own audio file for this story.

@@ -25,6 +25,13 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { contentApi } from '@/lib/content-api'
 import { DirectAudioGenerationButton } from '@/components/direct-audio-generation-button'
 import { SimpleUploadButton } from '@/components/simple-upload-button'
@@ -47,6 +54,8 @@ interface CreateWordDialogProps {
 export function CreateWordDialog({ lessonId, children, onSuccess }: CreateWordDialogProps) {
   const [open, setOpen] = useState(false)
   const [createdWordId, setCreatedWordId] = useState<number | null>(null)
+  const [wordVoice, setWordVoice] = useState<string>('Betty')
+  const [exampleVoice, setExampleVoice] = useState<string>('Betty')
   const queryClient = useQueryClient()
 
   const form = useForm<CreateWordData>({
@@ -91,6 +100,8 @@ export function CreateWordDialog({ lessonId, children, onSuccess }: CreateWordDi
     if (!open) {
       // Reset state when dialog closes
       setCreatedWordId(null)
+      setWordVoice('Betty')
+      setExampleVoice('Betty')
       form.reset()
     }
   }
@@ -180,14 +191,29 @@ export function CreateWordDialog({ lessonId, children, onSuccess }: CreateWordDi
                     {/* Word Audio */}
                     <div className='space-y-2'>
                       <span className='text-sm font-medium'>Word Audio</span>
-                      <div className='flex gap-2'>
-                        <DirectAudioGenerationButton
-                          onGenerate={() => contentApi.words.generateAudio(createdWordId, null)}
-                          queryKey={['words', lessonId]}
-                        >
-                          <Zap className='h-4 w-4 mr-2' />
-                          Generate
-                        </DirectAudioGenerationButton>
+                      <div className='space-y-2'>
+                        <Select value={wordVoice} onValueChange={setWordVoice}>
+                          <SelectTrigger className='w-48'>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value='Betty'>
+                              <div className='flex items-center gap-2'>
+                                <span>🇺🇸</span>
+                                Betty
+                              </div>
+                            </SelectItem>
+                            <SelectItem value='default'>Default</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <div className='flex gap-2'>
+                          <DirectAudioGenerationButton
+                            onGenerate={() => contentApi.words.generateAudio(createdWordId, wordVoice === 'default' ? null : wordVoice as any)}
+                            queryKey={['words', lessonId]}
+                          >
+                            <Zap className='h-4 w-4 mr-2' />
+                            Generate
+                          </DirectAudioGenerationButton>
                         <SimpleUploadButton
                           accept='audio/mp3,audio/mpeg,audio/*'
                           onUpload={(file) => contentApi.words.uploadAudio(createdWordId, file)}
@@ -196,6 +222,7 @@ export function CreateWordDialog({ lessonId, children, onSuccess }: CreateWordDi
                           <Upload className='h-4 w-4 mr-2' />
                           Upload Audio
                         </SimpleUploadButton>
+                        </div>
                       </div>
                     </div>
 
@@ -215,14 +242,29 @@ export function CreateWordDialog({ lessonId, children, onSuccess }: CreateWordDi
                     {/* Example Audio */}
                     <div className='space-y-2'>
                       <span className='text-sm font-medium'>Example Audio</span>
-                      <div className='flex gap-2'>
-                        <DirectAudioGenerationButton
-                          onGenerate={() => contentApi.words.generateExampleAudio(createdWordId, null)}
-                          queryKey={['words', lessonId]}
-                        >
-                          <Zap className='h-4 w-4 mr-2' />
-                          Generate
-                        </DirectAudioGenerationButton>
+                      <div className='space-y-2'>
+                        <Select value={exampleVoice} onValueChange={setExampleVoice}>
+                          <SelectTrigger className='w-48'>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value='Betty'>
+                              <div className='flex items-center gap-2'>
+                                <span>🇺🇸</span>
+                                Betty
+                              </div>
+                            </SelectItem>
+                            <SelectItem value='default'>Default</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <div className='flex gap-2'>
+                          <DirectAudioGenerationButton
+                            onGenerate={() => contentApi.words.generateExampleAudio(createdWordId, exampleVoice === 'default' ? null : exampleVoice as any)}
+                            queryKey={['words', lessonId]}
+                          >
+                            <Zap className='h-4 w-4 mr-2' />
+                            Generate
+                          </DirectAudioGenerationButton>
                         <SimpleUploadButton
                           accept='audio/mp3,audio/mpeg,audio/*'
                           onUpload={(file) => contentApi.words.uploadExampleAudio(createdWordId, file)}
@@ -231,6 +273,7 @@ export function CreateWordDialog({ lessonId, children, onSuccess }: CreateWordDi
                           <Upload className='h-4 w-4 mr-2' />
                           Upload Audio
                         </SimpleUploadButton>
+                        </div>
                       </div>
                     </div>
 
