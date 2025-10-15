@@ -17,7 +17,6 @@ import { Route as AuthenticatedUserManagementRouteImport } from './routes/_authe
 import { Route as AuthenticatedLearningCentersRouteImport } from './routes/_authenticated/learning-centers'
 import { Route as AuthenticatedDuoStatsRouteImport } from './routes/_authenticated/duo-stats'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
-import { Route as AuthenticatedDuoStatsCourseIdRouteImport } from './routes/_authenticated/duo-stats/$courseId'
 import { Route as AuthenticatedContentWordsRouteImport } from './routes/_authenticated/content/words'
 import { Route as AuthenticatedContentLessonsRouteImport } from './routes/_authenticated/content/lessons'
 import { Route as AuthenticatedContentCoursesRouteImport } from './routes/_authenticated/content/courses'
@@ -65,12 +64,6 @@ const AuthenticatedErrorsErrorRoute =
     path: '/errors/$error',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedDuoStatsCourseIdRoute =
-  AuthenticatedDuoStatsCourseIdRouteImport.update({
-    id: '/$courseId',
-    path: '/$courseId',
-    getParentRoute: () => AuthenticatedDuoStatsRoute,
-  } as any)
 const AuthenticatedContentWordsRoute =
   AuthenticatedContentWordsRouteImport.update({
     id: '/content/words',
@@ -98,7 +91,7 @@ const AuthenticatedContentChaptersRoute =
 
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
-  '/duo-stats': typeof AuthenticatedDuoStatsRouteWithChildren
+  '/duo-stats': typeof AuthenticatedDuoStatsRoute
   '/learning-centers': typeof AuthenticatedLearningCentersRoute
   '/user-management': typeof AuthenticatedUserManagementRoute
   '/zehnly-duo': typeof AuthenticatedZehnlyDuoRoute
@@ -107,12 +100,11 @@ export interface FileRoutesByFullPath {
   '/content/courses': typeof AuthenticatedContentCoursesRoute
   '/content/lessons': typeof AuthenticatedContentLessonsRoute
   '/content/words': typeof AuthenticatedContentWordsRoute
-  '/duo-stats/$courseId': typeof AuthenticatedDuoStatsCourseIdRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
-  '/duo-stats': typeof AuthenticatedDuoStatsRouteWithChildren
+  '/duo-stats': typeof AuthenticatedDuoStatsRoute
   '/learning-centers': typeof AuthenticatedLearningCentersRoute
   '/user-management': typeof AuthenticatedUserManagementRoute
   '/zehnly-duo': typeof AuthenticatedZehnlyDuoRoute
@@ -121,14 +113,13 @@ export interface FileRoutesByTo {
   '/content/courses': typeof AuthenticatedContentCoursesRoute
   '/content/lessons': typeof AuthenticatedContentLessonsRoute
   '/content/words': typeof AuthenticatedContentWordsRoute
-  '/duo-stats/$courseId': typeof AuthenticatedDuoStatsCourseIdRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/login': typeof LoginRoute
-  '/_authenticated/duo-stats': typeof AuthenticatedDuoStatsRouteWithChildren
+  '/_authenticated/duo-stats': typeof AuthenticatedDuoStatsRoute
   '/_authenticated/learning-centers': typeof AuthenticatedLearningCentersRoute
   '/_authenticated/user-management': typeof AuthenticatedUserManagementRoute
   '/_authenticated/zehnly-duo': typeof AuthenticatedZehnlyDuoRoute
@@ -137,7 +128,6 @@ export interface FileRoutesById {
   '/_authenticated/content/courses': typeof AuthenticatedContentCoursesRoute
   '/_authenticated/content/lessons': typeof AuthenticatedContentLessonsRoute
   '/_authenticated/content/words': typeof AuthenticatedContentWordsRoute
-  '/_authenticated/duo-stats/$courseId': typeof AuthenticatedDuoStatsCourseIdRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
 }
 export interface FileRouteTypes {
@@ -153,7 +143,6 @@ export interface FileRouteTypes {
     | '/content/courses'
     | '/content/lessons'
     | '/content/words'
-    | '/duo-stats/$courseId'
     | '/errors/$error'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -167,7 +156,6 @@ export interface FileRouteTypes {
     | '/content/courses'
     | '/content/lessons'
     | '/content/words'
-    | '/duo-stats/$courseId'
     | '/errors/$error'
   id:
     | '__root__'
@@ -182,7 +170,6 @@ export interface FileRouteTypes {
     | '/_authenticated/content/courses'
     | '/_authenticated/content/lessons'
     | '/_authenticated/content/words'
-    | '/_authenticated/duo-stats/$courseId'
     | '/_authenticated/errors/$error'
   fileRoutesById: FileRoutesById
 }
@@ -249,13 +236,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/duo-stats/$courseId': {
-      id: '/_authenticated/duo-stats/$courseId'
-      path: '/$courseId'
-      fullPath: '/duo-stats/$courseId'
-      preLoaderRoute: typeof AuthenticatedDuoStatsCourseIdRouteImport
-      parentRoute: typeof AuthenticatedDuoStatsRoute
-    }
     '/_authenticated/content/words': {
       id: '/_authenticated/content/words'
       path: '/content/words'
@@ -287,21 +267,8 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthenticatedDuoStatsRouteChildren {
-  AuthenticatedDuoStatsCourseIdRoute: typeof AuthenticatedDuoStatsCourseIdRoute
-}
-
-const AuthenticatedDuoStatsRouteChildren: AuthenticatedDuoStatsRouteChildren = {
-  AuthenticatedDuoStatsCourseIdRoute: AuthenticatedDuoStatsCourseIdRoute,
-}
-
-const AuthenticatedDuoStatsRouteWithChildren =
-  AuthenticatedDuoStatsRoute._addFileChildren(
-    AuthenticatedDuoStatsRouteChildren,
-  )
-
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedDuoStatsRoute: typeof AuthenticatedDuoStatsRouteWithChildren
+  AuthenticatedDuoStatsRoute: typeof AuthenticatedDuoStatsRoute
   AuthenticatedLearningCentersRoute: typeof AuthenticatedLearningCentersRoute
   AuthenticatedUserManagementRoute: typeof AuthenticatedUserManagementRoute
   AuthenticatedZehnlyDuoRoute: typeof AuthenticatedZehnlyDuoRoute
@@ -314,7 +281,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedDuoStatsRoute: AuthenticatedDuoStatsRouteWithChildren,
+  AuthenticatedDuoStatsRoute: AuthenticatedDuoStatsRoute,
   AuthenticatedLearningCentersRoute: AuthenticatedLearningCentersRoute,
   AuthenticatedUserManagementRoute: AuthenticatedUserManagementRoute,
   AuthenticatedZehnlyDuoRoute: AuthenticatedZehnlyDuoRoute,

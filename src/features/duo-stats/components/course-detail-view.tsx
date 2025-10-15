@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
 import { ArrowLeft, Users, Phone, BookOpen, Award } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -27,11 +26,11 @@ import { ProgressChart } from './progress-chart'
 
 interface CourseDetailViewProps {
   courseId: number
+  onBack: () => void
 }
 
-export function CourseDetailView({ courseId }: CourseDetailViewProps) {
+export function CourseDetailView({ courseId, onBack }: CourseDetailViewProps) {
   const { t } = useTranslation()
-  const navigate = useNavigate()
 
   const {
     data: courseDetails,
@@ -43,7 +42,7 @@ export function CourseDetailView({ courseId }: CourseDetailViewProps) {
   })
 
   const handleBackClick = () => {
-    navigate({ to: '/duo-stats' })
+    onBack()
   }
 
   if (isLoading) {

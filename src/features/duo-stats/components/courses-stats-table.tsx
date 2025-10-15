@@ -1,4 +1,3 @@
-import { useNavigate } from '@tanstack/react-router'
 import { Eye, GraduationCap, Users, Building2, BarChart3 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -25,14 +24,14 @@ interface CoursesStatsTableProps {
   data: CourseStats[]
   isLoading: boolean
   onRefresh: () => void
+  onCourseClick: (courseId: number) => void
 }
 
-export function CoursesStatsTable({ data, isLoading, onRefresh }: CoursesStatsTableProps) {
+export function CoursesStatsTable({ data, isLoading, onRefresh, onCourseClick }: CoursesStatsTableProps) {
   const { t } = useTranslation()
-  const navigate = useNavigate()
 
   const handleCourseClick = (courseId: number) => {
-    navigate({ to: `/duo-stats/${courseId}` })
+    onCourseClick(courseId)
   }
 
   if (isLoading) {
