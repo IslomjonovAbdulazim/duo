@@ -4,9 +4,9 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
   ResponsiveContainer,
   Cell,
+  LabelList,
 } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { type StudentProgress } from '@/lib/stats-api'
@@ -97,7 +97,7 @@ export function ProgressChart({ students }: ProgressChartProps) {
         <ResponsiveContainer width='100%' height={400}>
           <BarChart 
             data={chartData} 
-            margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+            margin={{ top: 40, right: 30, left: 20, bottom: 60 }}
           >
             <CartesianGrid strokeDasharray='3 3' opacity={0.3} />
             <XAxis 
@@ -112,22 +112,6 @@ export function ProgressChart({ students }: ProgressChartProps) {
               label={{ value: 'Number of Students', angle: -90, position: 'insideLeft' }}
               fontSize={12}
             />
-            <Tooltip 
-              formatter={(value, _, props) => [
-                `${value} students`,
-                props.payload?.label || 'Students'
-              ]}
-              labelFormatter={(label) => {
-                const item = chartData.find(d => d.range === label)
-                return item?.label || label
-              }}
-              contentStyle={{
-                backgroundColor: 'hsl(var(--background))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '6px',
-                fontSize: '14px'
-              }}
-            />
             <Bar 
               dataKey='students' 
               radius={[4, 4, 0, 0]}
@@ -135,6 +119,15 @@ export function ProgressChart({ students }: ProgressChartProps) {
               {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={getBarColor(entry.range)} />
               ))}
+              <LabelList 
+                dataKey="students" 
+                position="top"
+                style={{
+                  fill: 'hsl(var(--foreground))',
+                  fontSize: '14px',
+                  fontWeight: '600'
+                }}
+              />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
