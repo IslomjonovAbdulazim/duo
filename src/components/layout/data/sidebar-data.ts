@@ -6,6 +6,7 @@ import {
   Type,
   Users,
   Zap,
+  BarChart3,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 import { type Translations } from '@/i18n/translations'
@@ -63,6 +64,11 @@ export const getSidebarData = (t: Translations): SidebarData => ({
           url: '/zehnly-duo',
           icon: Zap,
         },
+        {
+          title: t.nav.duoStats,
+          url: '/duo-stats',
+          icon: BarChart3,
+        },
       ],
     },
   ],
@@ -82,5 +88,6 @@ export const sidebarData: SidebarData = getSidebarData({
     words: 'Words',
     userManagement: 'User Management',
     zehnlyDuo: 'Zehnly Duo',
+    duoStats: 'Duo Stats',
   },
 } as any)

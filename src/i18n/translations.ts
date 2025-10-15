@@ -30,6 +30,7 @@ export interface Translations {
     words: string;
     userManagement: string;
     zehnlyDuo: string;
+    duoStats: string;
   };
   
   // Common
@@ -274,6 +275,35 @@ export interface Translations {
     system: string;
   };
 
+  // Duo Stats
+  duoStats: {
+    title: string;
+    description: string;
+    noResults: string;
+    noResultsDescription: string;
+    courseDetail: {
+      title: string;
+      description: string;
+      totalStudents: string;
+      studentsProgress: string;
+      backToCourses: string;
+      noStudents: string;
+      noStudentsDescription: string;
+    };
+    table: {
+      course: string;
+      learningCenter: string;
+      totalStudents: string;
+      viewDetails: string;
+      students: string;
+      progress: string;
+      lessonsCompleted: string;
+      studentName: string;
+      phoneNumber: string;
+      noPhone: string;
+    };
+  };
+
   // General messages
   messages: {
     noChanges: string;
@@ -312,6 +342,7 @@ export const uzbekTranslations: Translations = {
     words: "So'zlar",
     userManagement: "Foydalanuvchilar",
     zehnlyDuo: "Zehnly Duo",
+    duoStats: "Duo Statistikasi",
   },
   
   common: {
@@ -550,6 +581,34 @@ export const uzbekTranslations: Translations = {
     system: "Tizim",
   },
 
+  duoStats: {
+    title: "Duo Statistikasi",
+    description: "Kurslar va o'quvchilar statistikasini kuzatish",
+    noResults: "Kurslar topilmadi",
+    noResultsDescription: "Hali hech qanday kurs yaratilmagan yoki ma'lumot mavjud emas.",
+    courseDetail: {
+      title: "Kurs Tafsilotlari",
+      description: "O'quvchilarning kurs bo'yicha rivojlanishi",
+      totalStudents: "Jami O'quvchilar",
+      studentsProgress: "O'quvchilar Rivojlanishi",
+      backToCourses: "Kurslarga Qaytish",
+      noStudents: "O'quvchilar topilmadi",
+      noStudentsDescription: "Ushbu kursga hali hech qanday o'quvchi ro'yxatdan o'tmagan.",
+    },
+    table: {
+      course: "Kurs",
+      learningCenter: "Ta'lim Markazi",
+      totalStudents: "Jami O'quvchilar",
+      viewDetails: "Tafsilotlarni Ko'rish",
+      students: "o'quvchi",
+      progress: "Rivojlanish",
+      lessonsCompleted: "Bajarilgan Darslar",
+      studentName: "O'quvchi Ismi",
+      phoneNumber: "Telefon Raqami",
+      noPhone: "Telefon yo'q",
+    },
+  },
+
   messages: {
     noChanges: "Hech qanday o'zgarish aniqlanmadi",
     contentNotModified: "Kontent o'zgartirilmadi!",
@@ -587,6 +646,7 @@ export const englishTranslations: Translations = {
     words: "Words",
     userManagement: "User Management",
     zehnlyDuo: "Zehnly Duo",
+    duoStats: "Duo Stats",
   },
   
   common: {
@@ -823,6 +883,34 @@ export const englishTranslations: Translations = {
     light: "Light",
     dark: "Dark",
     system: "System",
+  },
+
+  duoStats: {
+    title: "Duo Stats",
+    description: "Track course and student statistics",
+    noResults: "No courses found",
+    noResultsDescription: "No courses have been created yet or no data is available.",
+    courseDetail: {
+      title: "Course Details",
+      description: "Student progress for this course",
+      totalStudents: "Total Students",
+      studentsProgress: "Student Progress",
+      backToCourses: "Back to Courses",
+      noStudents: "No students found",
+      noStudentsDescription: "No students have enrolled in this course yet.",
+    },
+    table: {
+      course: "Course",
+      learningCenter: "Learning Center",
+      totalStudents: "Total Students",
+      viewDetails: "View Details",
+      students: "students",
+      progress: "Progress",
+      lessonsCompleted: "Lessons Completed",
+      studentName: "Student Name",
+      phoneNumber: "Phone Number",
+      noPhone: "No phone",
+    },
   },
 
   messages: {
