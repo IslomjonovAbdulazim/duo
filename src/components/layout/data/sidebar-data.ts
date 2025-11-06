@@ -1,7 +1,5 @@
 import {
   Command,
-  Zap,
-  BarChart3,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 import { type Translations } from '@/i18n/translations'
@@ -19,23 +17,7 @@ export const getSidebarData = (t: Translations): SidebarData => ({
       plan: t.nav.planName,
     },
   ],
-  navGroups: [
-    {
-      title: t.nav.general,
-      items: [
-        {
-          title: t.nav.zehnlyDuo,
-          url: '/zehnly-duo',
-          icon: Zap,
-        },
-        {
-          title: t.nav.duoStats,
-          url: '/duo-stats',
-          icon: BarChart3,
-        },
-      ],
-    },
-  ],
+  navGroups: [],
 })
 
 // Keep the old export for backward compatibility, but it will use English by default
