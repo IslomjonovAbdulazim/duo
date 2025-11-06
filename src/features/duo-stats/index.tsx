@@ -7,7 +7,6 @@ import { TopNav } from '@/components/layout/top-nav'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { ConfigDrawer } from '@/components/config-drawer'
 import { statsApi } from '@/lib/stats-api'
 import { CoursesStatsTable } from './components/courses-stats-table'
 import { CourseDetailView } from './components/course-detail-view'
@@ -97,7 +96,6 @@ export function DuoStats() {
         <div className='ms-auto flex items-center space-x-4'>
           <Search />
           <ThemeSwitch />
-          <ConfigDrawer />
           <ProfileDropdown />
         </div>
       </Header>

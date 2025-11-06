@@ -10,7 +10,6 @@ import { TopNav } from '@/components/layout/top-nav'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { ConfigDrawer } from '@/components/config-drawer'
 import { contentApi, type Course, type Chapter, type Lesson, type Word, type Story } from '@/lib/content-api'
 import { CreateCourseDialog } from '@/features/content-management/components/create-course-dialog'
 import { EditCourseDialog } from '@/features/content-management/components/edit-course-dialog'
@@ -280,7 +279,6 @@ export function ZehnlyDuoPage() {
         <div className='ms-auto flex items-center space-x-4'>
           <Search />
           <ThemeSwitch />
-          <ConfigDrawer />
           <ProfileDropdown />
         </div>
       </Header>
