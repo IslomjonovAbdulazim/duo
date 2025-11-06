@@ -13,25 +13,26 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  access_token: string
-  token_type: string
+  success: boolean
+  user?: AuthUser
 }
 
-// Auth API functions
+// Auth API functions with bypass key
 export const authApi = {
-  // Super Admin Login
+  // Admin authentication using bypass key
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
-    const response = await api.post<LoginResponse>('/admin/login', credentials)
-    return response.data
+    try {
+      // Since bypass key is in headers, just verify admin access
+      const response = await api.post<LoginResponse>('/admin/verify', credentials)
+      return response.data
+    } catch (error) {
+      return { success: false }
+    }
   },
 
-  // Logout (optional - if backend supports it)
+  // Logout
   logout: async (): Promise<void> => {
-    try {
-      await api.post('/admin/logout')
-    } catch (error) {
-      // Logout endpoint may not exist, continue with client-side logout
-      console.warn('Logout endpoint not available:', error)
-    }
+    // Client-side logout only since we use bypass key
+    return Promise.resolve()
   },
 }

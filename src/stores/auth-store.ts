@@ -1,8 +1,7 @@
 import { create } from 'zustand'
 import { getCookie, setCookie, removeCookie } from '@/lib/cookies'
 
-const ACCESS_TOKEN = 'super_admin_access_token'
-const USER_DATA = 'super_admin_user_data'
+const ADMIN_SESSION = 'admin_session_data'
 
 interface AuthUser {
   id: number
@@ -13,51 +12,52 @@ interface AuthUser {
 interface AuthState {
   auth: {
     user: AuthUser | null
+    isAuthenticated: boolean
     setUser: (user: AuthUser | null) => void
-    accessToken: string
-    setAccessToken: (accessToken: string) => void
-    resetAccessToken: () => void
+    setAuthenticated: (authenticated: boolean) => void
     reset: () => void
   }
 }
 
 export const useAuthStore = create<AuthState>()((set) => {
-  const tokenCookie = getCookie(ACCESS_TOKEN)
-  const userCookie = getCookie(USER_DATA)
-  
-  const initToken = tokenCookie ? JSON.parse(tokenCookie) : ''
-  const initUser = userCookie ? JSON.parse(userCookie) : null
+  const sessionCookie = getCookie(ADMIN_SESSION)
+  const initUser = sessionCookie ? JSON.parse(sessionCookie) : null
   
   return {
     auth: {
       user: initUser,
+      isAuthenticated: !!initUser,
       setUser: (user) =>
         set((state) => {
           if (user) {
-            setCookie(USER_DATA, JSON.stringify(user))
+            setCookie(ADMIN_SESSION, JSON.stringify(user))
           } else {
-            removeCookie(USER_DATA)
+            removeCookie(ADMIN_SESSION)
           }
-          return { ...state, auth: { ...state.auth, user } }
+          return { 
+            ...state, 
+            auth: { 
+              ...state.auth, 
+              user,
+              isAuthenticated: !!user
+            } 
+          }
         }),
-      accessToken: initToken,
-      setAccessToken: (accessToken) =>
-        set((state) => {
-          setCookie(ACCESS_TOKEN, JSON.stringify(accessToken))
-          return { ...state, auth: { ...state.auth, accessToken } }
-        }),
-      resetAccessToken: () =>
-        set((state) => {
-          removeCookie(ACCESS_TOKEN)
-          return { ...state, auth: { ...state.auth, accessToken: '' } }
-        }),
+      setAuthenticated: (authenticated) =>
+        set((state) => ({
+          ...state,
+          auth: { ...state.auth, isAuthenticated: authenticated }
+        })),
       reset: () =>
         set((state) => {
-          removeCookie(ACCESS_TOKEN)
-          removeCookie(USER_DATA)
+          removeCookie(ADMIN_SESSION)
           return {
             ...state,
-            auth: { ...state.auth, user: null, accessToken: '' },
+            auth: { 
+              ...state.auth, 
+              user: null, 
+              isAuthenticated: false 
+            },
           }
         }),
     },

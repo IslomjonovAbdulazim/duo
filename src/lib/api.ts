@@ -1,39 +1,20 @@
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios'
-import { useAuthStore } from '@/stores/auth-store'
 
-const BASE_URL = 'https://zehnlyduo-production.up.railway.app'
-
-// Create axios instance
+// Create axios instance with environment variables
 const api: AxiosInstance = axios.create({
-  baseURL: BASE_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
+    'X-Admin-Bypass': import.meta.env.VITE_ADMIN_BYPASS_KEY,
   },
-  timeout: 10000, // 10 second timeout
+  timeout: 10000,
 })
-
-// Request interceptor to add auth token
-api.interceptors.request.use(
-  (config) => {
-    const { accessToken } = useAuthStore.getState().auth
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`
-    }
-    return config
-  },
-  (error) => {
-    return Promise.reject(error)
-  }
-)
 
 // Response interceptor for error handling
 api.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid, reset auth state
-      useAuthStore.getState().auth.reset()
-    }
+    // Handle errors gracefully
     return Promise.reject(error)
   }
 )
