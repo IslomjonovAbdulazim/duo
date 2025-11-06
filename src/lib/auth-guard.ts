@@ -1,8 +1,8 @@
 import { useAuthStore } from '@/stores/auth-store'
 
 export const isAuthenticated = (): boolean => {
-  const { user, accessToken } = useAuthStore.getState().auth
-  return !!(user && accessToken)
+  const { user, isAuthenticated } = useAuthStore.getState().auth
+  return !!(user && isAuthenticated)
 }
 
 export const requireAuth = () => {
@@ -14,6 +14,6 @@ export const requireAuth = () => {
 }
 
 export const getAuthHeaders = () => {
-  const { accessToken } = useAuthStore.getState().auth
-  return accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+  // Admin bypass key is automatically included in all requests via api.ts
+  return {}
 }

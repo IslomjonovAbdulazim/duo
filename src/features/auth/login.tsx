@@ -42,18 +42,14 @@ export function Login() {
     try {
       const response = await authApi.login(data)
       
-      // Create a default user object for super admin
-      const superAdminUser = {
-        id: 1,
-        email: data.email,
-        role: 'super_admin'
+      if (response.success && response.user) {
+        auth.setUser(response.user)
+        auth.setAuthenticated(true)
+        toast.success(t.auth.loginSuccess)
+        navigate({ to: '/' })
+      } else {
+        toast.error(t.auth.loginFailed)
       }
-      
-      auth.setUser(superAdminUser)
-      auth.setAccessToken(response.access_token)
-      
-      toast.success(t.auth.loginSuccess)
-      navigate({ to: '/' })
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || t.auth.loginFailed
       toast.error(errorMessage)
