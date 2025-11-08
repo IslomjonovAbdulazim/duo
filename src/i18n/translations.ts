@@ -31,6 +31,7 @@ export interface Translations {
     userManagement: string;
     zehnlyDuo: string;
     duoStats: string;
+    analytics: string;
   };
   
   // Common
@@ -343,6 +344,7 @@ export const uzbekTranslations: Translations = {
     userManagement: "Foydalanuvchilar",
     zehnlyDuo: "Zehnly Duo",
     duoStats: "Duo Statistikasi",
+    analytics: "Analitika",
   },
   
   common: {
@@ -647,6 +649,7 @@ export const englishTranslations: Translations = {
     userManagement: "User Management",
     zehnlyDuo: "Zehnly Duo",
     duoStats: "Duo Stats",
+    analytics: "Analytics",
   },
   
   common: {

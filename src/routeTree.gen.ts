@@ -16,6 +16,7 @@ import { Route as AuthenticatedZehnlyDuoRouteImport } from './routes/_authentica
 import { Route as AuthenticatedUserManagementRouteImport } from './routes/_authenticated/user-management'
 import { Route as AuthenticatedLearningCentersRouteImport } from './routes/_authenticated/learning-centers'
 import { Route as AuthenticatedDuoStatsRouteImport } from './routes/_authenticated/duo-stats'
+import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
 import { Route as AuthenticatedContentWordsRouteImport } from './routes/_authenticated/content/words'
 import { Route as AuthenticatedContentLessonsRouteImport } from './routes/_authenticated/content/lessons'
@@ -58,6 +59,11 @@ const AuthenticatedDuoStatsRoute = AuthenticatedDuoStatsRouteImport.update({
   path: '/duo-stats',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedErrorsErrorRoute =
   AuthenticatedErrorsErrorRouteImport.update({
     id: '/errors/$error',
@@ -91,6 +97,7 @@ const AuthenticatedContentChaptersRoute =
 
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
+  '/analytics': typeof AuthenticatedAnalyticsRoute
   '/duo-stats': typeof AuthenticatedDuoStatsRoute
   '/learning-centers': typeof AuthenticatedLearningCentersRoute
   '/user-management': typeof AuthenticatedUserManagementRoute
@@ -104,6 +111,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/analytics': typeof AuthenticatedAnalyticsRoute
   '/duo-stats': typeof AuthenticatedDuoStatsRoute
   '/learning-centers': typeof AuthenticatedLearningCentersRoute
   '/user-management': typeof AuthenticatedUserManagementRoute
@@ -119,6 +127,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/duo-stats': typeof AuthenticatedDuoStatsRoute
   '/_authenticated/learning-centers': typeof AuthenticatedLearningCentersRoute
   '/_authenticated/user-management': typeof AuthenticatedUserManagementRoute
@@ -134,6 +143,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/login'
+    | '/analytics'
     | '/duo-stats'
     | '/learning-centers'
     | '/user-management'
@@ -147,6 +157,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/analytics'
     | '/duo-stats'
     | '/learning-centers'
     | '/user-management'
@@ -161,6 +172,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/login'
+    | '/_authenticated/analytics'
     | '/_authenticated/duo-stats'
     | '/_authenticated/learning-centers'
     | '/_authenticated/user-management'
@@ -229,6 +241,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDuoStatsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/analytics': {
+      id: '/_authenticated/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/errors/$error': {
       id: '/_authenticated/errors/$error'
       path: '/errors/$error'
@@ -268,6 +287,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedDuoStatsRoute: typeof AuthenticatedDuoStatsRoute
   AuthenticatedLearningCentersRoute: typeof AuthenticatedLearningCentersRoute
   AuthenticatedUserManagementRoute: typeof AuthenticatedUserManagementRoute
@@ -281,6 +301,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedDuoStatsRoute: AuthenticatedDuoStatsRoute,
   AuthenticatedLearningCentersRoute: AuthenticatedLearningCentersRoute,
   AuthenticatedUserManagementRoute: AuthenticatedUserManagementRoute,
