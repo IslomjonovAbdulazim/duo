@@ -34,6 +34,7 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { ConfirmDialog } from '@/components/confirm-dialog'
+import { BulkAudioGenerationButton } from '@/components/bulk-audio-generation-button'
 import { contentApi, type Word, buildMediaUrl } from '@/lib/content-api'
 
 interface WordsTableProps {
@@ -41,6 +42,7 @@ interface WordsTableProps {
   isLoading?: boolean
   onEdit: (word: Word) => void
   onRefresh: () => void
+  lessonId?: number
 }
 
 export function WordsTable({
@@ -48,6 +50,7 @@ export function WordsTable({
   isLoading,
   onEdit,
   onRefresh,
+  lessonId,
 }: WordsTableProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedWord, setSelectedWord] = useState<Word | null>(null)
@@ -144,10 +147,19 @@ export function WordsTable({
                 Manage vocabulary words and their translations
               </CardDescription>
             </div>
-            <div className='text-right'>
-              <div className='text-sm text-muted-foreground'>Total Words</div>
-              <div className='text-2xl font-bold text-primary'>
-                {data.length}
+            <div className='flex items-center gap-4'>
+              {lessonId && data.length > 0 && (
+                <BulkAudioGenerationButton
+                  words={data}
+                  lessonId={lessonId}
+                  onSuccess={onRefresh}
+                />
+              )}
+              <div className='text-right'>
+                <div className='text-sm text-muted-foreground'>Total Words</div>
+                <div className='text-2xl font-bold text-primary'>
+                  {data.length}
+                </div>
               </div>
             </div>
           </div>

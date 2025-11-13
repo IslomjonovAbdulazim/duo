@@ -462,6 +462,7 @@ export function ZehnlyDuoPage() {
                 isLoading={wordsLoading}
                 onEdit={handleEditWord}
                 onRefresh={handleRefreshWords}
+                lessonId={selectedLesson.id}
               />
             ) : (
               <div className='text-center py-8 text-muted-foreground'>
